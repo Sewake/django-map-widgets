@@ -54,7 +54,7 @@
             this.marker = new google.maps.Marker({
                 position: marker_position,
                 map: this.map,
-                draggable: true
+                draggable: false
             });
             this.marker.addListener("dragend", this.dragMarker.bind(this));
         },

@@ -13,14 +13,13 @@
                             Longitude:
                             <input type="text" id="{{ name }}-mw-overlay-longitude" class="form-control mw-overlay-input mw-overlay-longitude" placeholder="Ex: 28.979530"/>
                         </label>
+
                         <a class="mw-btn mw-btn-success mw-btn-coordinates-done pull-right">Done</a>
                     </div>
                 </div>
 
-                <a class="mw-btn mw-btn-info mw-btn-my-location" >Use My Location</a>
-                <a class="mw-btn mw-btn-warning mw-btn-add-marker" ><i class="icon-location"></i></a>
                 <div class="mw-adress-input-wrap pull-right">
-                    <input type="text" class="form-control pull-right" id="{{ name }}-mw-google-address-input" placeholder="Enter or update the address here"/>
+                    <input type="text" class="form-control pull-right google-search" id="{{ name }}-mw-google-address-input" placeholder="Enter or update the address here"/>
                 </div>
             {% endblock header %}
         </div>
@@ -29,6 +28,9 @@
             <div class="mw-loader-overlay hide" >
                 <div class="mw-loader"></div>
             </div>
+
+            
+
             <div id="{{ name }}-map-elem" class="mw-map"></div>
             <div style="display: none" class="hide">
                 <textarea id="{{ id }}" name="{{ name }}">{{ serialized }}</textarea>
@@ -37,16 +39,15 @@
 
             </div>
         </div>
-
-        <div class="mw-footer">
-            <span class="mw-help-text help-text"></span>
-            <a class="mw-btn mw-btn-delete pull-right {{ serialized|yesno:"mw-btn-danger, mw-btn-default disabled" }}" ><i class="icon-trash-empty"></i></a>
-        </div>
+        <label for="{{ name }}">
+                <input type="text" id="{{ name }}" class="form-control mw-overlay-input"  placeholder="Concat"/>
+            </label>
         <div class="animated-loader"></div>
     {% endblock container %}
 </div>
 
 {% block javascript %}
+
     <script type="application/javascript">
         (function($) {
             var mapOptions = JSON.parse("{{ options|escapejs }}");
@@ -77,11 +78,28 @@
                 markerCreateTriggerNameSpace: "google_point_map_widget:marker_create",
                 markerChangeTriggerNameSpace: "google_point_map_widget:marker_change",
                 markerDeleteTriggerNameSpace: "google_point_map_widget:marker_delete"
-            };
+            };              
+
+            $("#{{ name }}").hide();
+
+            $(".mw-btn-coordinates-done").click(function() {
+              $("#{{ name }}").val($("#{{ name }}-mw-overlay-latitude").val()+","+$("#{{ name }}-mw-overlay-longitude").val());
+            });
+
+            $( ".google-search" ).blur(function() {
+              setTimeout(function() {
+                 $("#{{ name }}").val($("#{{ name }}-mw-overlay-latitude").val()+","+$("#{{ name }}-mw-overlay-longitude").val());
+              }, 30);
+            });
+
+    
             new DjangoGooglePointFieldWidget(mapWidgetOptions);
+            var marker = new google.maps.Marker();
+            marker.setDraggable(false);
             {% block extra_javascript %}
 
             {% endblock %}
         })(jQuery || django.jQuery);
+         
     </script>
 {% endblock javascript %}
